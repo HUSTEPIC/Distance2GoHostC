@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28922.388
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Distance2Go", "Distance2Go\Distance2Go.vcxproj", "{899525A1-E3DF-43E0-A6B0-FFCDD9705FED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{899525A1-E3DF-43E0-A6B0-FFCDD9705FED}.Debug|x64.ActiveCfg = Debug|x64
+		{899525A1-E3DF-43E0-A6B0-FFCDD9705FED}.Debug|x64.Build.0 = Debug|x64
+		{899525A1-E3DF-43E0-A6B0-FFCDD9705FED}.Debug|x86.ActiveCfg = Debug|Win32
+		{899525A1-E3DF-43E0-A6B0-FFCDD9705FED}.Debug|x86.Build.0 = Debug|Win32
+		{899525A1-E3DF-43E0-A6B0-FFCDD9705FED}.Release|x64.ActiveCfg = Release|x64
+		{899525A1-E3DF-43E0-A6B0-FFCDD9705FED}.Release|x64.Build.0 = Release|x64
+		{899525A1-E3DF-43E0-A6B0-FFCDD9705FED}.Release|x86.ActiveCfg = Release|Win32
+		{899525A1-E3DF-43E0-A6B0-FFCDD9705FED}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AF9B903C-E2D1-469F-9890-E31056586330}
+	EndGlobalSection
+EndGlobal
