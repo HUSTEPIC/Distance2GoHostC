@@ -38,7 +38,7 @@
 #include "library/Protocol.h"
 #include "library/COMPort.h"
 #include "library/EndpointRadarBase.h"
-
+#include <time.h>
 #define AUTOMATIC_DATA_FRAME_TRIGGER (1)		// define if automatic trigger is active or not
 
 //#define AUTOMATIC_DATA_TRIGER_TIME_US (1000000)	// get ADC data each 1ms in automatic trigger mode
@@ -57,15 +57,21 @@ void received_frame_data(void* context,
 {
 	// Print the sampled data which can be found in frame_info->sample_data
 	//for (uint32_t i = 0; i < frame_info->num_samples_per_chirp*2; i++)
-	for (uint32_t i = 0; i < frame_info->num_samples_per_chirp; i++)
+	for (uint32_t i = 0; i < frame_info->num_samples_per_chirp *2 ; i++)
 	{
 
-	    if(i == 0)
-	    {
-	        printf("Frame_number = %d\n", frame_info->frame_number);
-	        printf("Num_chirps = %d\n", frame_info->num_chirps);
-	        printf("Num_rx_antennas = %d\n", frame_info->num_rx_antennas);
-	    }
+		printf(" i == %d \n", i);
+		time_t timep;
+		struct tm* pTime;
+		time(&timep);
+		
+
+	    //if(i == 0)
+	    //{
+	    //    printf("Frame_number = %d\n", frame_info->frame_number);
+	    //    printf("Num_chirps = %d\n", frame_info->num_chirps);
+	    //    printf("Num_rx_antennas = %d\n", frame_info->num_rx_antennas);
+	    //}
 
 		//printf("ADC sample %d:     %f\n", i, frame_info->sample_data[i]);
 
@@ -80,7 +86,7 @@ void received_frame_data(void* context,
 
 		因此我们这里I信号数据暂时选用第249号信号点，Q选499号信号的数据
         */
-	    else if (i == 249)
+	    if (i == 249)
 		{
 			FILE* p = fopen(outputFileNameI, "a+");
 			char msg[100];
@@ -93,7 +99,8 @@ void received_frame_data(void* context,
 			{
 				//sprintf(msgTmp, "%d           ", i);
 				//strcpy(msg, msgTmp);
-				sprintf(msgTmp, "%f", frame_info->sample_data[i]);
+				pTime = gmtime(&timep);
+				sprintf(msgTmp, "%f\t%d-%d-%d, %d:%d:%d\n", frame_info->sample_data[i], pTime->tm_year + 1900, pTime->tm_mon + 1, pTime->tm_mday, pTime->tm_hour + 8, pTime->tm_min, pTime->tm_sec);
 				strcpy(msg, msgTmp);
 				strcat(msg, "\n");
 				fputs(msg, p);
@@ -113,7 +120,9 @@ void received_frame_data(void* context,
 			{
 				//sprintf(msgTmp, "%d           ", i);
 				//strcpy(msg, msgTmp);
-				sprintf(msgTmp, "%f", frame_info->sample_data[i]);
+				pTime = gmtime(&timep);
+				sprintf(msgTmp, "%f\t%d-%d-%d, %d:%d:%d\n", frame_info->sample_data[i], pTime->tm_year + 1900, pTime->tm_mon + 1, pTime->tm_mday, pTime->tm_hour + 8, pTime->tm_min, pTime->tm_sec);
+
 				strcpy(msg, msgTmp);
 				strcat(msg, "\n");
 				fputs(msg, p);
