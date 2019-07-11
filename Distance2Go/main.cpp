@@ -39,14 +39,29 @@
 #include "library/COMPort.h"
 #include "library/EndpointRadarBase.h"
 #include <time.h>
+#include <windows.h>
 #define AUTOMATIC_DATA_FRAME_TRIGGER (1)		// define if automatic trigger is active or not
 
 //#define AUTOMATIC_DATA_TRIGER_TIME_US (1000000)	// get ADC data each 1ms in automatic trigger mode
 #define AUTOMATIC_DATA_TRIGER_TIME_US (1)
 
+
+#define MAX_BUFFER_SIZE 1024
 //保存输出数据的文件名，可以改
 char outputFileNameI[100] = { "outputI.log" };
 char outputFileNameQ[100] = { "outputQ.log" };
+
+//
+int ITempLen = 0;
+int QTempLen = 0;
+int IWholeLen = 0;
+int QWholeLen = 0;
+
+char msgI[MAX_BUFFER_SIZE];
+char msgQ[MAX_BUFFER_SIZE];
+char msgTmp[50];
+
+SYSTEMTIME currentTime;
 
 //每次读取数据后都会调用的回调函数
 // called every time ep_radar_base_get_frame_data method is called to return measured time domain signals
@@ -60,24 +75,9 @@ void received_frame_data(void* context,
 	for (uint32_t i = 0; i < frame_info->num_samples_per_chirp *2 ; i++)
 	{
 
-		printf(" i == %d \n", i);
-		time_t timep;
-		struct tm* pTime;
-		time(&timep);
 		
 
-	    //if(i == 0)
-	    //{
-	    //    printf("Frame_number = %d\n", frame_info->frame_number);
-	    //    printf("Num_chirps = %d\n", frame_info->num_chirps);
-	    //    printf("Num_rx_antennas = %d\n", frame_info->num_rx_antennas);
-	    //}
-
-		//printf("ADC sample %d:     %f\n", i, frame_info->sample_data[i]);
-
-
         //这里将数据读到文件中
-		//根据冷同学的论文，0-249是I信号数据，250-499是Q信号数据
 		/*根据冷同学的论文：
 		“通过GUI和提取出来的数据都可以发现，
 		整个I信号的250个samples点呈现一种驻波形式，
@@ -88,45 +88,55 @@ void received_frame_data(void* context,
         */
 	    if (i == 249)
 		{
-			FILE* p = fopen(outputFileNameI, "a+");
-			char msg[100];
-			char msgTmp[50];
-			if (p == NULL)
+			//形成字符串msgTmp
+			GetSystemTime(&currentTime);
+			sprintf(msgTmp, "%f\t%u:%u:%u:%u\n", frame_info->sample_data[i],
+				currentTime.wHour + 8, currentTime.wMinute, currentTime.wSecond,
+				currentTime.wMilliseconds);
+			printf(msgTmp);
+
+
+			//将msgTmp加到整体中
+			ITempLen = strlen(msgTmp);
+			if (IWholeLen + ITempLen >= MAX_BUFFER_SIZE)
 			{
-				printf("file open error \n");
+				msgI[IWholeLen] = '\0';
+				IWholeLen = 0;
+				//输出到文件
+				FILE* p = fopen(outputFileNameI, "a+");
+				fputs(msgI, p);
+				fclose(p);
 			}
 			else
 			{
-				//sprintf(msgTmp, "%d           ", i);
-				//strcpy(msg, msgTmp);
-				pTime = gmtime(&timep);
-				sprintf(msgTmp, "%f\t%d-%d-%d, %d:%d:%d\n", frame_info->sample_data[i], pTime->tm_year + 1900, pTime->tm_mon + 1, pTime->tm_mday, pTime->tm_hour + 8, pTime->tm_min, pTime->tm_sec);
-				strcpy(msg, msgTmp);
-				strcat(msg, "\n");
-				fputs(msg, p);
-				fclose(p);
+				strncpy(msgI + IWholeLen, msgTmp, ITempLen);
+				IWholeLen += ITempLen;
 			}
         }
 		else if (i == 499)
 		{
-			FILE* p = fopen(outputFileNameQ, "a+");
-			char msg[100];
-			char msgTmp[50];
-			if (p == NULL)
+			//形成字符串msgTmp
+			GetSystemTime(&currentTime);
+			sprintf(msgTmp, "%f\t %u:%u:%u:%u \n", frame_info->sample_data[i],
+				currentTime.wHour + 8, currentTime.wMinute, currentTime.wSecond,
+				currentTime.wMilliseconds);
+			printf(msgTmp);
+
+			//将msgTmp加到整体中
+			QTempLen = strlen(msgTmp);
+			if (QWholeLen + QTempLen >= MAX_BUFFER_SIZE)
 			{
-				printf("file open error \n");
+				msgQ[QWholeLen] = '\0';
+				QWholeLen = 0;
+				//输出到文件
+				FILE* p = fopen(outputFileNameQ, "a+");
+				fputs(msgQ, p);
+				fclose(p);
 			}
 			else
 			{
-				//sprintf(msgTmp, "%d           ", i);
-				//strcpy(msg, msgTmp);
-				pTime = gmtime(&timep);
-				sprintf(msgTmp, "%f\t%d-%d-%d, %d:%d:%d\n", frame_info->sample_data[i], pTime->tm_year + 1900, pTime->tm_mon + 1, pTime->tm_mday, pTime->tm_hour + 8, pTime->tm_min, pTime->tm_sec);
-
-				strcpy(msg, msgTmp);
-				strcat(msg, "\n");
-				fputs(msg, p);
-				fclose(p);
+				strncpy(msgQ + QWholeLen, msgTmp, QTempLen);
+				QWholeLen += QTempLen;
 			}
 		}
         //*/
